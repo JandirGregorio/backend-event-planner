@@ -50,11 +50,14 @@ const seed = async () => {
       )
     `);
 
-  const luffyHash = await bcrypt.hash('joyboyishere', SALT_ROUNDS);
-  const oliverHash = await bcrypt.hash('soccerfield', SALT_ROUNDS);
-  const mikeHash = await bcrypt.hash('thriller123', SALT_ROUNDS);
+  const [luffyHash, oliverHash, mikeHash] = await Promise.all([
+    bcrypt.hash('joyboyishere', SALT_ROUNDS),
+    bcrypt.hash('soccerfield', SALT_ROUNDS),
+    bcrypt.hash('thriller123', SALT_ROUNDS)
+  ]
+  );
 
-  const {rows: users } = await pool.query(`
+  const { rows: users } = await pool.query(`
     INSERT INTO users (username, password_hash) VALUES ('luffy', $1),
     ('oliver',  $2),
     ('mike',  $3)
