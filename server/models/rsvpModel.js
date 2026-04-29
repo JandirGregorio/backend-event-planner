@@ -34,7 +34,7 @@ module.exports.createRsvp = async (user_id, event_id) => {
 module.exports.destroyRsvp = async (user_id, event_id) => {
   const query = `
     DELETE FROM rsvps
-    WHERE user_id = $1 AND user_id $2
+    WHERE user_id = $1 AND event_id = $2
     RETURNING user_id, event_id
   `;
 
@@ -44,7 +44,7 @@ module.exports.destroyRsvp = async (user_id, event_id) => {
 
 module.exports.findRsvp = async (rsvp_id) => {
   const query = `
-    SELECT rsvp_id FROM rsvps WHERE rsvp_id = $1
+    SELECT rsvp_id, user_id, event_id FROM rsvps WHERE rsvp_id = $1
   `;
   const { rows } = await pool.query(query, [rsvp_id]);
   return rows[0] || null;

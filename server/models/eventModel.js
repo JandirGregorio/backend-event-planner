@@ -18,7 +18,7 @@ module.exports.listEvents = async () => {
 
 module.exports.listEventByUser = async (user_id) => {
   const query = `
-    SELECT events.*, users.username, COUNT(*) AS rsvp_count
+    SELECT events.*, users.username, COUNT(rsvps.rsvp_id) AS rsvp_count
     FROM events
       INNER JOIN users
       ON events.user_id = users.user_id
@@ -66,7 +66,6 @@ module.exports.updateEvent = async (event_id, title, description, date, location
 
   // Filters out only allowed fields to prevent SQL injection and fields that have values in it
   const filteredFields = Object.keys(data).filter((key) => data[key] !== undefined);
-'title = $1, des=$2'
   const paramaterizedQueries = filteredFields
                                     .map((key, index) => `${key} = $${index + 1}`)
                                     .join(', ');
