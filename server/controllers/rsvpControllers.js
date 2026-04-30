@@ -15,7 +15,7 @@ module.exports.listUserRsvps = async (req, res, next) => {
 module.exports.createRsvp = async (req, res, next) => {
   try {
     const eventId = Number(req.params.event_id);
-    const rsvp = await rsvpModel.createRsvp(req.session.userID, eventId);
+    const rsvp = await rsvpModel.createRsvp(req.session.userId, eventId);
     res.status(201).send(rsvp);
   } catch (err) {
     next(err);
