@@ -1,6 +1,6 @@
 const userModel = require('../models/userModel');
 
-// PATCH /api/users/:user_id
+// PATCH /api/users/:user_id { password }
 module.exports.updateUser = async (req, res, next) => {
   try {
     const userId = Number(req.params.user_id);
