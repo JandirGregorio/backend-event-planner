@@ -20,7 +20,23 @@ module.exports.listRsvpByUser = async (user_id) => {
   return rows;
 };
 
+const isEventAtCapacity = async (event_id) => {
+  const query = `
+    SELECT COUNT(rsvps.rsvp_id) >= events.max_capacity AS capacity_reached
+    FROM events
+    LEFT JOIN rsvps ON rsvps.event_id = events.event_id
+    WHERE events.event_id = $1
+    GROUP BY events.max_capacity
+  `;
+  const { rows } = await pool.query(query, [event_id]);
+  return rows[0]?.capacity_reached ?? false;
+};
+
 module.exports.createRsvp = async (user_id, event_id) => {
+  if (await isEventAtCapacity(event_id)) {
+    return null;
+  }
+
   const query = `
     INSERT INTO rsvps(user_id, event_id) VALUES 
       ($1, $2) ON CONFLICT DO NOTHING
