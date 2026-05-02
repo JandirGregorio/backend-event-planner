@@ -55,29 +55,27 @@ module.exports.findEvent = async (event_id) => {
 };
 
 module.exports.updateEvent = async (event_id, title, description, date, location, event_type, max_capacity) => {
-  const data = {
-    title,
-    description,
-    date,
-    location,
-    event_type,
-    max_capacity,
-  };
-
-  // Filters out only allowed fields to prevent SQL injection and fields that have values in it
-  const filteredFields = Object.keys(data).filter((key) => data[key] !== undefined);
-  const paramaterizedQueries = filteredFields
-                                    .map((key, index) => `${key} = $${index + 1}`)
-                                    .join(', ');
-
-  const values = [...filteredFields.map((key) => data[key]), event_id];
-
   const query = `
-    UPDATE events
-    SET ${paramaterizedQueries}
-    WHERE event_id = $${values.length}
-    RETURNING event_id, title, description, date, location, event_type, max_capacity
+  UPDATE events SET
+    title         = COALESCE($1, title),
+    description   = COALESCE($2, description),
+    date          = COALESCE($3, date),
+    location      = COALESCE($4, location),
+    event_type    = COALESCE($5, event_type),
+    max_capacity  = COALESCE($6, max_capacity)
+  WHERE event_id  = $7
+  RETURNING event_id, title, description, date, location, event_type, max_capacity
   `;
+
+  const values = [
+    title ?? null,
+    description ?? null,
+    date ?? null,
+    location ?? null,
+    event_type ?? null,
+    max_capacity ?? null,
+    event_id
+  ];
   const { rows } = await pool.query(query, values);
   return rows[0] || null;
 };
